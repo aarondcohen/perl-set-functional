@@ -35,18 +35,162 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
+=head2 setify(@)
 
 =cut
 
-sub function1 {
+sub setify(@) {
+  my %set;
+  undef @set{@_} if @_;
+
+  return keys %set;
 }
 
-=head2 function2
+=head2 setify_by(&@)
 
 =cut
 
-sub function2 {
+sub setify_by(&@){
+	my $func = shift;
+
+	my %set;
+	@set{ map { $func->($_) } @_ } = @_ if @_;
+
+	return values %set;
+}
+
+=head2 difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+  my $first = shift;
+
+	return unless @$first;
+
+  my %set;
+  undef @set{@$first};
+
+  do { delete @set{@$_} if @$_ } for @_;
+
+  return keys %set;
+}
+
+=head2 difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my $func = shift;
+  my $first = shift;
+
+	return unless @$first;
+
+  my %set;
+	@set{ map { $func->($_) } @$first } = @$first;
+
+  do { delete @set{ map { $func->($_) } @$_ } if @$_ } for @_;
+
+  return values %set;
+}
+
+=head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my %set;
+	do { ++$set{$_} for @$_ } for @_;
+
+	return grep { $set{$_} == 1 } keys %set;
+}
+
+=head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my $func = shift;
+
+	my %set;
+	for (@_) {
+		for (@$_) {
+			my $key = $func->($_);
+			if (exists $set{$key}) { undef $set{$key} }
+			else { $set{$key} = $_ }
+		}
+	}
+
+	return grep { defined } values %set;
+}
+
+=head2 intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+  my $first = shift;
+
+	return unless @$first;
+
+  my %set;
+  undef @set{@$first};
+
+  for (@_) {
+    my @int = grep { exists $set{$_} } @$_;
+    return unless @int;
+    undef %set;
+    undef @set{@int}
+  }
+
+  return keys %set;
+}
+
+=head2 intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my $func = shift;
+  my $first = shift;
+
+	return unless @$first;
+
+  my %set;
+	@set{ map { $func->($_) } @$first } = @$first;
+
+  for (@_) {
+    my @int = grep { exists $set{$func->($_)} } @$_;
+    return unless @int;
+    undef %set;
+		@set{ map { $func->($_) } @int } = @int;
+  }
+
+  return values %set;
+}
+
+=head2 union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+  my %set;
+  do { undef @set{@$_} if @$_ } for @_;
+
+  return keys %set;
+}
+
+=head2 union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+=cut
+
+sub union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my $func = shift;
+
+	my %set;
+	do { $set{ map { $func->($_) } @$_ } = @$_ if @$_ } for @_;
+
+	return values %set;
 }
 
 =head1 AUTHOR
