@@ -47,8 +47,8 @@ Example usage:
 	my @only_arr1_elements = difference @arr1, @arr2, @arr3, @arr4;
 	my @only_arr1_names = difference_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
-	my @unique_elements = distinct @arr1, @arr2, @arr3, @arr4;
-	my @unique_names = distinct_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @unique_elements = disjoint @arr1, @arr2, @arr3, @arr4;
+	my @unique_names = disjoint_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 	my @shared_elements = intersect @arr1, @arr2, @arr3, @arr4;
 	my @shared_names = intersect_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
@@ -132,28 +132,28 @@ sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return values %set;
 }
 
-=head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
 Given multiple sets, return a new set containing all the elements that exist
 in any set exactly once.
 
 =cut
 
-sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my %set;
 	do { ++$set{$_} for @$_ } for @_;
 
 	return grep { $set{$_} == 1 } keys %set;
 }
 
-=head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
 Given a choice function and multiple sets, return a new set containing all the
 elements that exist in any set exactly once according to the choice function.
 
 =cut
 
-sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my $func = shift;
 
 	my %set;
