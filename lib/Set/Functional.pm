@@ -6,7 +6,7 @@ use warnings;
 
 =head1 NAME
 
-Set::Functional - The great new Set::Functional!
+Set::Functional - set operations for functional programming
 
 =head1 VERSION
 
@@ -16,26 +16,56 @@ Version 0.01
 
 our $VERSION = '0.01';
 
+#TODO: provide function exporting
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+This module provides basic set operations for native lists.  The primary goal
+is to take advantage of Perl's native functional programming capabilities
+while relying solely on Pure Perl constructs to perform the set operations as
+fast as possible.  All of these techniques have been benchmarked against other
+common Perl idioms to determine the optimal solution.  These benchmarks can
+be found in this package (shortly).
 
-Perhaps a little code snippet.
+Each function is provided in two forms.  The first form always expects simple
+flat data structures of defined elements.  The second form expects a BLOCK
+to evaluate each member of the list to a defined value to determine how the
+element is a set member.  These can be identified by the suffix "_by".  None
+of these functions check definedness inline so as to eliminate the costly
+O(n) operation.  All functions have been prototyped to give them a native
+Perl-ish look and feel.  Use of the '&' sigil is recommended to ignore the
+prototyping to send subroutine and array references.  See perldoc perlsub
+for more details.
 
-    use Set::Functional;
+Example usage:
 
-    my $foo = Set::Functional->new();
-    ...
+	use Set::Functional ':all';
+
+	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
+	my @deduped_names = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
+
+	my @only_arr1_elements = difference @arr1, @arr2, @arr3, @arr4;
+	my @only_arr1_names = difference_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+
+	my @unique_elements = distinct @arr1, @arr2, @arr3, @arr4;
+	my @unique_names = distinct_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+
+	my @shared_elements = intersect @arr1, @arr2, @arr3, @arr4;
+	my @shared_names = intersect_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+
+	my @all_elements = union @arr1, @arr2, @arr3, @arr4;
+	my @all_names = union_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 =head1 EXPORT
 
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
 =head2 setify(@)
+
+Given a list, return a new set.
 
 =cut
 
@@ -47,6 +77,8 @@ sub setify(@) {
 }
 
 =head2 setify_by(&@)
+
+Given a choice function and a list, return a new set defined by the choice function.
 
 =cut
 
@@ -60,6 +92,9 @@ sub setify_by(&@){
 }
 
 =head2 difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given multiple sets, return a new set with all the elements in the first set
+that don't exist in subsequent sets.
 
 =cut
 
@@ -77,6 +112,9 @@ sub difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 }
 
 =head2 difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given a choice function and multiple sets, return a new set with all the elements
+in the first set that don't exist in subsequent sets according to the choice function.
 
 =cut
 
@@ -96,6 +134,9 @@ sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 
 =head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
+Given multiple sets, return a new set containing all the elements that exist
+in any set exactly once.
+
 =cut
 
 sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
@@ -106,6 +147,9 @@ sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 }
 
 =head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given a choice function and multiple sets, return a new set containing all the
+elements that exist in any set exactly once according to the choice function.
 
 =cut
 
@@ -125,6 +169,9 @@ sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 }
 
 =head2 intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given multiple sets, return a new set containing all the elements that exist
+in all sets.
 
 =cut
 
@@ -147,6 +194,9 @@ sub intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 }
 
 =head2 intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given a choice function and multiple sets, return a new set containing all the
+elements that exist in all sets according to the choice function.
 
 =cut
 
@@ -171,6 +221,9 @@ sub intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 
 =head2 union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
+Given multiple sets, return a new set containing all the elements that exist
+in any set.
+
 =cut
 
 sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
@@ -181,6 +234,9 @@ sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\
 }
 
 =head2 union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given a choice function and multiple sets, return a new set containing all the
+elements that exist in any set according to the choice function.
 
 =cut
 
