@@ -50,8 +50,8 @@ Example usage:
 	my @unique_elements = disjoint @arr1, @arr2, @arr3, @arr4;
 	my @unique_names = disjoint_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
-	my @shared_elements = intersect @arr1, @arr2, @arr3, @arr4;
-	my @shared_names = intersect_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @shared_elements = intersection @arr1, @arr2, @arr3, @arr4;
+	my @shared_names = intersection_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 	my @all_elements = union @arr1, @arr2, @arr3, @arr4;
 	my @all_names = union_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
