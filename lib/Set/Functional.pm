@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 
+use Exporter qw{import};
+
 =head1 NAME
 
 Set::Functional - set operations for functional programming
@@ -16,7 +18,15 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-#TODO: provide function exporting
+our @EXPORT_OK  = qw{
+	setify setify_by
+	difference difference_by
+	disjoint disjoint_by
+	distinct distinct_by
+	intersection intersection_by
+	union union_by
+};
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 =head1 SYNOPSIS
 
