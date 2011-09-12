@@ -74,6 +74,7 @@ Given a list, return a new set.
 
 sub setify(@) {
 	my %set;
+
 	undef @set{@_} if @_;
 
 	return keys %set;
@@ -89,6 +90,7 @@ sub setify_by(&@){
 	my $func = shift;
 
 	my %set;
+
 	@set{ map { $func->($_) } @_ } = @_ if @_;
 
 	return values %set;
@@ -107,6 +109,7 @@ sub difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return unless @$first;
 
 	my %set;
+
 	undef @set{@$first};
 
 	do { delete @set{@$_} if @$_ } for @_;
@@ -128,6 +131,7 @@ sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return unless @$first;
 
 	my %set;
+
 	@set{ map { $func->($_) } @$first } = @$first;
 
 	do { delete @set{ map { $func->($_) } @$_ } if @$_ } for @_;
@@ -161,11 +165,11 @@ according to the choice function.
 sub disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my $func = shift;
 
-	my %element_to_count;
+	my %key_to_count;
 
-	do { ++$element_to_count{$func->{$_}} for @$_ } for @_;
+	do { ++$key_to_count{$func->{$_}} for @$_ } for @_;
 
-	return map { [grep { $element_to_count{$func->{$_}} == 1 } @$_] } @_;
+	return map { [grep { $key_to_count{$func->{$_}} == 1 } @$_] } @_;
 }
 
 =head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
@@ -176,10 +180,11 @@ in any set exactly once.
 =cut
 
 sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
-	my %set;
-	do { ++$set{$_} for @$_ } for @_;
+	my %element_to_count;
 
-	return grep { $set{$_} == 1 } keys %set;
+	do { ++$element_to_count{$_} for @$_ } for @_;
+
+	return grep { $element_to_count{$_} == 1 } keys %element_to_count;
 }
 
 =head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
@@ -192,15 +197,16 @@ elements that exist in any set exactly once according to the choice function.
 sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my $func = shift;
 
-	my %set;
+	my %key_to_count;
+
 	for (@_) {
 		for (@$_) {
 			my $key = $func->($_);
-			$set{$key} = exists $set{$key} ? undef : $_;
+			$key_to_count{$key} = exists $key_to_count{$key} ? undef : $_;
 		}
 	}
 
-	return grep { defined } values %set;
+	return grep { defined } values %key_to_count;
 }
 
 =head2 intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
@@ -216,6 +222,7 @@ sub intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return unless @$first;
 
 	my %set;
+
 	undef @set{@$first};
 
 	for (@_) {
@@ -242,6 +249,7 @@ sub intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return unless @$first;
 
 	my %set;
+
 	@set{ map { $func->($_) } @$first } = @$first;
 
 	for (@_) {
@@ -263,6 +271,7 @@ in any set.
 
 sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my %set;
+
 	do { undef @set{@$_} if @$_ } for @_;
 
 	return keys %set;
@@ -279,6 +288,7 @@ sub union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\
 	my $func = shift;
 
 	my %set;
+
 	do { $set{ map { $func->($_) } @$_ } = @$_ if @$_ } for @_;
 
 	return values %set;
