@@ -42,19 +42,22 @@ Example usage:
 	use Set::Functional ':all';
 
 	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
-	my @deduped_names = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
+	my @deduped_objects_by_name = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
 
 	my @only_arr1_elements = difference @arr1, @arr2, @arr3, @arr4;
-	my @only_arr1_names = difference_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @only_arr1_elements_by_name = difference_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
-	my @unique_elements = disjoint @arr1, @arr2, @arr3, @arr4;
-	my @unique_names = disjoint_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @unique_per_set = disjoint @arr1, @arr2, @arr3, @arr4;
+	my @unique_per_set_by_name = disjoint_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+
+	my @unique_elements = distinct @arr1, @arr2, @arr3, @arr4;
+	my @unique_elements_by_name = distinct_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 	my @shared_elements = intersection @arr1, @arr2, @arr3, @arr4;
-	my @shared_names = intersection_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @shared_elements_by_name = intersection_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 	my @all_elements = union @arr1, @arr2, @arr3, @arr4;
-	my @all_names = union_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @all_elements_by_name = union_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
 
 =head1 EXPORT
 
@@ -134,34 +137,66 @@ sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 
 =head2 disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
-Given multiple sets, return a new set containing all the elements that exist
-in any set exactly once.
+Given multiple sets, return corresponding sets containing all the elements from
+the original set that exist in any set exactly once.
 
 =cut
 
 sub disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
-	my %set;
-	do { ++$set{$_} for @$_ } for @_;
+	my %element_to_count;
 
-	return grep { $set{$_} == 1 } keys %set;
+	do { ++$element_to_count{$_} for @$_ } for @_;
+
+	return map { [grep { $element_to_count{$_} == 1 } @$_] } @_;
 }
 
 =head2 disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
 
-Given a choice function and multiple sets, return a new set containing all the
-elements that exist in any set exactly once according to the choice function.
+Given a choice function and multiple sets, return corresponding sets containing
+all the elements from the original set that exist in any set exactly once
+according to the choice function.
 
 =cut
 
 sub disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
 	my $func = shift;
 
+	my %element_to_count;
+
+	do { ++$element_to_count{$func->{$_}} for @$_ } for @_;
+
+	return map { [grep { $element_to_count{$func->{$_}} == 1 } @$_] } @_;
+}
+
+=head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given multiple sets, return a new set containing all the elements that exist
+in any set exactly once.
+
+=cut
+
+sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my %set;
+	do { ++$set{$_} for @$_ } for @_;
+
+	return grep { $set{$_} == 1 } keys %set;
+}
+
+=head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+
+Given a choice function and multiple sets, return a new set containing all the
+elements that exist in any set exactly once according to the choice function.
+
+=cut
+
+sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+	my $func = shift;
+
 	my %set;
 	for (@_) {
 		for (@$_) {
 			my $key = $func->($_);
-			if (exists $set{$key}) { undef $set{$key} }
-			else { $set{$key} = $_ }
+			$set{$key} = exists $set{$key} ? undef : $_;
 		}
 	}
 
