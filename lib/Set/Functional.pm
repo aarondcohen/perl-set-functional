@@ -43,9 +43,7 @@ to evaluate each member of the list to a defined value to determine how the
 element is a set member.  These can be identified by the suffix "_by".  None
 of these functions check definedness inline so as to eliminate the costly
 O(n) operation.  All functions have been prototyped to give them a native
-Perl-ish look and feel.  Use of the '&' sigil is recommended to ignore the
-prototyping to send subroutine and array references.  See perldoc perlsub
-for more details.
+Perl-ish look and feel.
 
 Example usage:
 
@@ -54,20 +52,20 @@ Example usage:
 	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
 	my @deduped_objects_by_name = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
 
-	my @only_arr1_elements = difference @arr1, @arr2, @arr3, @arr4;
-	my @only_arr1_elements_by_name = difference_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @only_arr1_elements = difference \@arr1, \@arr2, \@arr3, \@arr4;
+	my @only_arr1_elements_by_name = difference_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-	my @unique_per_set = disjoint @arr1, @arr2, @arr3, @arr4;
-	my @unique_per_set_by_name = disjoint_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @unique_per_set = disjoint \@arr1, \@arr2, \@arr3, \@arr4;
+	my @unique_per_set_by_name = disjoint_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-	my @unique_elements = distinct @arr1, @arr2, @arr3, @arr4;
-	my @unique_elements_by_name = distinct_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @unique_elements = distinct \@arr1, \@arr2, \@arr3, \@arr4;
+	my @unique_elements_by_name = distinct_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-	my @shared_elements = intersection @arr1, @arr2, @arr3, @arr4;
-	my @shared_elements_by_name = intersection_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @shared_elements = intersection \@arr1, \@arr2, \@arr3, \@arr4;
+	my @shared_elements_by_name = intersection_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-	my @all_elements = union @arr1, @arr2, @arr3, @arr4;
-	my @all_elements_by_name = union_by { $_->{name} } @arr1, @arr2, @arr3, @arr4;
+	my @all_elements = union \@arr1, \@arr2, \@arr3, \@arr4;
+	my @all_elements_by_name = union_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
 =head1 EXPORT
 
@@ -106,17 +104,17 @@ sub setify_by(&@){
 	return values %set;
 }
 
-=head2 difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 difference(@)
 
-Given multiple sets, return a new set with all the elements in the first set
+Given multiple set references, return a new set with all the elements in the first set
 that don't exist in subsequent sets.
 
 =cut
 
-sub difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub difference(@) {
 	my $first = shift;
 
-	return unless @$first;
+	return unless $first && @$first;
 
 	my %set;
 
@@ -127,18 +125,18 @@ sub difference(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return keys %set;
 }
 
-=head2 difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 difference_by(&@)
 
-Given a choice function and multiple sets, return a new set with all the elements
+Given a choice function and multiple set references, return a new set with all the elements
 in the first set that don't exist in subsequent sets according to the choice function.
 
 =cut
 
-sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub difference_by(&@) {
 	my $func = shift;
 	my $first = shift;
 
-	return unless @$first;
+	return unless $first && @$first;
 
 	my %set;
 
@@ -149,14 +147,14 @@ sub difference_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return values %set;
 }
 
-=head2 disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 disjoint(@)
 
-Given multiple sets, return corresponding sets containing all the elements from
+Given multiple set references, return corresponding sets containing all the elements from
 the original set that exist in any set exactly once.
 
 =cut
 
-sub disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub disjoint(@) {
 	my %element_to_count;
 
 	do { ++$element_to_count{$_} for @$_ } for @_;
@@ -164,15 +162,15 @@ sub disjoint(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return map { [grep { $element_to_count{$_} == 1 } @$_] } @_;
 }
 
-=head2 disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 disjoint_by(&@)
 
-Given a choice function and multiple sets, return corresponding sets containing
+Given a choice function and multiple set references, return corresponding sets containing
 all the elements from the original set that exist in any set exactly once
 according to the choice function.
 
 =cut
 
-sub disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub disjoint_by(&@) {
 	my $func = shift;
 
 	my %key_to_count;
@@ -182,14 +180,14 @@ sub disjoint_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return map { [grep { $key_to_count{$func->{$_}} == 1 } @$_] } @_;
 }
 
-=head2 distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 distinct(@)
 
-Given multiple sets, return a new set containing all the elements that exist
+Given multiple set references, return a new set containing all the elements that exist
 in any set exactly once.
 
 =cut
 
-sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub distinct(@) {
 	my %element_to_count;
 
 	do { ++$element_to_count{$_} for @$_ } for @_;
@@ -197,14 +195,14 @@ sub distinct(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return grep { $element_to_count{$_} == 1 } keys %element_to_count;
 }
 
-=head2 distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 distinct_by(&@)
 
-Given a choice function and multiple sets, return a new set containing all the
+Given a choice function and multiple set references, return a new set containing all the
 elements that exist in any set exactly once according to the choice function.
 
 =cut
 
-sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub distinct_by(&@) {
 	my $func = shift;
 
 	my %key_to_count;
@@ -219,17 +217,17 @@ sub distinct_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return grep { defined } values %key_to_count;
 }
 
-=head2 intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 intersection(@)
 
-Given multiple sets, return a new set containing all the elements that exist
+Given multiple set references, return a new set containing all the elements that exist
 in all sets.
 
 =cut
 
-sub intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub intersection(@) {
 	my $first = shift;
 
-	return unless @$first;
+	return unless $first && @$first;
 
 	my %set;
 
@@ -245,18 +243,18 @@ sub intersection(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return keys %set;
 }
 
-=head2 intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 intersection_by(&@)
 
-Given a choice function and multiple sets, return a new set containing all the
+Given a choice function and multiple set references, return a new set containing all the
 elements that exist in all sets according to the choice function.
 
 =cut
 
-sub intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub intersection_by(&@) {
 	my $func = shift;
 	my $first = shift;
 
-	return unless @$first;
+	return unless $first && @$first;
 
 	my %set;
 
@@ -272,14 +270,14 @@ sub intersection_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@
 	return values %set;
 }
 
-=head2 union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 union(@)
 
-Given multiple sets, return a new set containing all the elements that exist
+Given multiple set references, return a new set containing all the elements that exist
 in any set.
 
 =cut
 
-sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub union(@) {
 	my %set;
 
 	do { undef @set{@$_} if @$_ } for @_;
@@ -287,14 +285,14 @@ sub union(;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\
 	return keys %set;
 }
 
-=head2 union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@)
+=head2 union_by(&@)
 
-Given a choice function and multiple sets, return a new set containing all the
+Given a choice function and multiple set references, return a new set containing all the
 elements that exist in any set according to the choice function.
 
 =cut
 
-sub union_by(&;\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@\@) {
+sub union_by(&@) {
 	my $func = shift;
 
 	my %set;
@@ -311,18 +309,14 @@ Aaron Cohen, C<< <aarondcohen at gmail.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-set-functional at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Functional>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Functional>.  I will
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Set::Functional
-
 
 You can also look for information at:
 
@@ -359,7 +353,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 
