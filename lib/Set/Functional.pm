@@ -175,9 +175,9 @@ sub disjoint_by(&@) {
 
 	my %key_to_count;
 
-	do { ++$key_to_count{$func->{$_}} for @$_ } for @_;
+	do { ++$key_to_count{$func->($_)} for @$_ } for @_;
 
-	return map { [grep { $key_to_count{$func->{$_}} == 1 } @$_] } @_;
+	return map { [grep { $key_to_count{$func->($_)} == 1 } @$_] } @_;
 }
 
 =head2 distinct(@)
@@ -297,7 +297,7 @@ sub union_by(&@) {
 
 	my %set;
 
-	do { $set{ map { $func->($_) } @$_ } = @$_ if @$_ } for @_;
+	do { @set{ map { $func->($_) } @$_ } = @$_ if @$_ } for @_;
 
 	return values %set;
 }
