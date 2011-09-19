@@ -1,4 +1,4 @@
-use Test::More tests => 24;
+use Test::More tests => 29;
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ is_deeply
 #Difference
 is_deeply [difference], [], 'difference returns the empty set with no sets';
 is_deeply [order difference \@arr_num1], \@arr_num1, 'difference returns the same elements with one set';
+is_deeply [order difference \@arr_num1, []], \@arr_num1, 'difference with the empty set returns the first set';
 is_deeply
 	[order difference @arr_nums],
 	[1, 3, 5],
@@ -41,6 +42,7 @@ is_deeply
 #Disjoint
 is_deeply [disjoint], [], 'disjoint returns the empty set with no sets';
 is_deeply [order disjoint \@arr_num1], [\@arr_num1], 'disjoint returns the same elements with one set';
+is_deeply [order disjoint \@arr_num1, []], [\@arr_num1, []], 'disjoint with the empty set returns the first set and the empty set';
 is_deeply
 	[map {[order @$_]} disjoint @arr_nums],
 	[[1,3,5],[11,13,15],[16,18,20]],
@@ -53,6 +55,7 @@ is_deeply
 #Distinct
 is_deeply [distinct], [], 'distinct returns the empty set with no sets';
 is_deeply [order distinct \@arr_num1], \@arr_num1, 'distinct returns the same elements with one set';
+is_deeply [order distinct \@arr_num1, []], \@arr_num1, 'distinct with the empty set returns all the elements from the first set';
 is_deeply
 	[order distinct @arr_nums],
 	[1,3,5,11,13,15,16,18,20],
@@ -65,6 +68,7 @@ is_deeply
 #Intersection
 is_deeply [intersection], [], 'intersection returns the empty set with no sets';
 is_deeply [order intersection \@arr_num1], \@arr_num1, 'intersection returns the same elements with one set';
+is_deeply [order intersection \@arr_num1, []], [], 'intersection with the empty set returns the empty set';
 is_deeply
 	[order intersection @arr_nums],
 	[6,8,10],
@@ -77,6 +81,7 @@ is_deeply
 #Union
 is_deeply [union], [], 'union returns the empty set with no sets';
 is_deeply [order union \@arr_num1], \@arr_num1, 'union returns the same elements with one set';
+is_deeply [order union \@arr_num1, []], \@arr_num1, 'union with the empty set returns the first set';
 is_deeply
 	[order union @arr_nums],
 	[1 .. 16, 18, 20],
