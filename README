@@ -1,16 +1,19 @@
-Set-Functional
+Set-Functional - set operations for functional programming
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+This module provides basic set operations for native lists.  The primary goal
+is to take advantage of Perl's native functional programming capabilities
+while relying solely on Pure Perl constructs to perform the set operations as
+fast as possible.  All of these techniques have been benchmarked against other
+common Perl idioms to determine the optimal solution.  These benchmarks can
+be found in this package (shortly).
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
-
+Each function is provided in two forms.  The first form always expects simple
+flat data structures of defined elements.  The second form expects a BLOCK
+to evaluate each member of the list to a defined value to determine how the
+element is a set member.  These can be identified by the suffix "_by".  None
+of these functions check definedness inline so as to eliminate the costly
+O(n) operation.  All functions have been prototyped to give them a native
+Perl-ish look and feel.
 
 INSTALLATION
 

@@ -1,8 +1,6 @@
 package Set::Functional;
 
 use 5.006;
-use strict;
-use warnings;
 
 use Exporter qw{import};
 
