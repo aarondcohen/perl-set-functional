@@ -310,6 +310,16 @@ Please report any bugs or feature requests to C<bug-set-functional at rt.cpan.or
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Functional>.  I will
 be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
+=head1 TODO
+
+=over 4
+
+=item * Add benchmarking scripts as mentioned above.
+
+=item * Add the function cartesian.
+
+=back
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -337,10 +347,6 @@ L<http://cpanratings.perl.org/d/Set-Functional>
 L<http://search.cpan.org/dist/Set-Functional/>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
