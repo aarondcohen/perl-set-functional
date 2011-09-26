@@ -52,6 +52,8 @@ Example usage:
 	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
 	my @deduped_objects_by_name = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
 
+	my @all_permutations = cartesian \@arr1, \@arr2, \@arr3, \@arr4;
+
 	my @only_arr1_elements = difference \@arr1, \@arr2, \@arr3, \@arr4;
 	my @only_arr1_elements_by_name = difference_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
@@ -63,6 +65,9 @@ Example usage:
 
 	my @shared_elements = intersection \@arr1, \@arr2, \@arr3, \@arr4;
 	my @shared_elements_by_name = intersection_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
+
+	my @odd_occuring_elements = symmetric_difference \@arr1, \@arr2, \@arr3, \@arr4;
+	my @odd_occuring_elements_by_name = symmetric_difference_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
 	my @all_elements = union \@arr1, \@arr2, \@arr3, \@arr4;
 	my @all_elements_by_name = union_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
@@ -76,7 +81,9 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head2 setify(@)
 
-Given a list, return a new set.
+Given a list, return a new set.  Order is not guaranteed.
+
+	setify 1 .. 10, 6 .. 15 => 1 .. 15
 
 =cut
 
@@ -90,7 +97,8 @@ sub setify(@) {
 
 =head2 setify_by(&@)
 
-Given a choice function and a list, return a new set defined by the choice function.
+Given a choice function and a list, return a new set defined by the choice
+function. Order is not guaranteed.
 
 =cut
 
@@ -109,6 +117,8 @@ sub setify_by(&@){
 Given multiple set references, return multiple sets containing all permutations
 of one element from each set.  If the empty set is provided, the empty set is
 returned.  If no sets are provided then none are returned.
+
+	cartesian [1 .. 3], [1 .. 2] => [1,1],[1,2],[2,1],[2,2],[3,1],[3,2]
 
 =cut
 
@@ -133,6 +143,8 @@ sub cartesian(@) {
 
 Given multiple set references, return a new set with all the elements in the first set
 that don't exist in subsequent sets.
+
+	difference [1 .. 10], [6 .. 15] => 1 .. 5
 
 =cut
 
@@ -177,6 +189,8 @@ sub difference_by(&@) {
 Given multiple set references, return corresponding sets containing all the elements from
 the original set that exist in any set exactly once.
 
+	disjoint [1 .. 10], [6 .. 15] => [1 .. 5], [11 .. 15]
+
 =cut
 
 sub disjoint(@) {
@@ -209,6 +223,8 @@ sub disjoint_by(&@) {
 
 Given multiple set references, return a new set containing all the elements that exist
 in any set exactly once.
+
+	distinct [1 .. 10], [6 .. 15] => 1 .. 5, 11 .. 15
 
 =cut
 
@@ -246,6 +262,8 @@ sub distinct_by(&@) {
 
 Given multiple set references, return a new set containing all the elements that exist
 in all sets.
+
+	intersection [1 .. 10], [6 .. 15] => 6 .. 10
 
 =cut
 
@@ -297,8 +315,10 @@ sub intersection_by(&@) {
 
 =head2 symmetric_difference(@)
 
-Given multiple set references, return corresponding sets containing all the elements from
-the original set that exist an odd number of times across all sets.
+Given multiple set references, return a new set containing all the elements that
+exist an odd number of times across all sets.
+
+	symmetric_difference [1 .. 10], [6 .. 15], [4, 8, 12] => 1 .. 5, 8, 11 .. 15
 
 =cut
 
@@ -313,9 +333,9 @@ sub symmetric_difference(@) {
 
 =head2 symmetric_difference_by(&@)
 
-Given a choice function and multiple set references, return corresponding sets containing
-all the elements from the original set that exist an odd number of times across all sets
-according to the choice function.
+Given a choice function and multiple set references, return a new set containing
+all the elements that exist an odd number of times across all sets according to
+the choice function.
 
 =cut
 
@@ -339,6 +359,8 @@ sub symmetric_difference_by(&@) {
 
 Given multiple set references, return a new set containing all the elements that exist
 in any set.
+
+	union [1 .. 10], [6 .. 15] => 1 .. 15
 
 =cut
 
@@ -383,7 +405,9 @@ be notified, and then you'll automatically be notified of progress on your bug a
 
 =item * Add benchmarking scripts as mentioned above.
 
-=item * Add the function cartesian.
+=item * Add validation functions: is_disjoint, is_empty, is_equal, is_null, is_pairwise_disjoint, is_proper_subset, is_proper_superset, is_subset, is_superset
+
+=item * Add SEE ALSO section
 
 =back
 
