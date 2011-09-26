@@ -1,0 +1,4 @@
+.git/
+ignore.txt
+MANIFEST.bak
+MANIFEST.SKIP

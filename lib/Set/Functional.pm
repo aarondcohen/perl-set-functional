@@ -18,10 +18,12 @@ our $VERSION = '0.01';
 
 our @EXPORT_OK  = qw{
 	setify setify_by
+	cartesian
 	difference difference_by
 	disjoint disjoint_by
 	distinct distinct_by
 	intersection intersection_by
+	symmetric_difference symmetric_difference_by
 	union union_by
 };
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
@@ -100,6 +102,31 @@ sub setify_by(&@){
 	@set{ map { $func->($_) } @_ } = @_ if @_;
 
 	return values %set;
+}
+
+=head2 cartesian(@)
+
+Given multiple set references, return multiple sets containing all permutations
+of one element from each set.  If the empty set is provided, the empty set is
+returned.  If no sets are provided then none are returned.
+
+=cut
+
+sub cartesian(@) {
+	return unless @_;
+
+	my @results;
+	my $repetitions = 1;
+
+	($repetitions *= @$_) || return [] for @_;
+	$#results = $repetitions - 1;
+
+	for my $idx (0 .. $#results) {
+		$repetitions = @results;
+		$results[$idx] = [map { $_->[int($idx/($repetitions /= @$_)) % @$_] } @_];
+	}
+
+	return @results;
 }
 
 =head2 difference(@)
@@ -266,6 +293,46 @@ sub intersection_by(&@) {
 	}
 
 	return values %set;
+}
+
+=head2 symmetric_difference(@)
+
+Given multiple set references, return corresponding sets containing all the elements from
+the original set that exist an odd number of times across all sets.
+
+=cut
+
+sub symmetric_difference(@) {
+	my $count;
+	my %element_to_count;
+
+	do { ++$element_to_count{$_} for @$_ } for @_;
+
+	return grep { $element_to_count{$_} % 2 } keys %element_to_count;
+}
+
+=head2 symmetric_difference_by(&@)
+
+Given a choice function and multiple set references, return corresponding sets containing
+all the elements from the original set that exist an odd number of times across all sets
+according to the choice function.
+
+=cut
+
+sub symmetric_difference_by(&@) {
+	my $func = shift;
+
+	my $count;
+	my %key_to_count;
+
+	do { ++$key_to_count{$func->($_)} for @$_ } for @_;
+
+	return map {
+		grep {
+			$count = delete $key_to_count{$func->($_)};
+			defined($count) && $count % 2
+		} @$_
+	} @_;
 }
 
 =head2 union(@)
