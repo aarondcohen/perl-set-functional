@@ -23,6 +23,8 @@ our @EXPORT_OK  = qw{
 	disjoint disjoint_by
 	distinct distinct_by
 	intersection intersection_by
+	is_proper_subset is_proper_superset
+	is_subset is_superset
 	symmetric_difference symmetric_difference_by
 	union union_by
 };
@@ -49,6 +51,7 @@ Example usage:
 
 	use Set::Functional ':all';
 
+  # Set manipulation
 	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
 	my @deduped_objects_by_name = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
 
@@ -71,6 +74,23 @@ Example usage:
 
 	my @all_elements = union \@arr1, \@arr2, \@arr3, \@arr4;
 	my @all_elements_by_name = union_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
+
+  # Predicates
+	is_subset([1], [1,2,3]);     # => 1
+	is_subset([1,2,3], [1]);     # => 0
+	is_subset([1,2,3], [1,2,3]); # => 1
+
+  is_proper_subset([1,2,3], [1,2,3]); # => 0
+  is_proper_subset([1,2,3], [1,2]);   # => 0
+  is_proper_subset([1,2], [1,2,3]);   # => 1
+
+  is_superset([1,2,3], [1,2]);   # => 1
+  is_superset([1,2], [1,2,3]);   # => 0
+  is_superset([1,2,3], [1,2,3]); # => 1
+
+  is_proper_superset([1,2,3], [1,2]);   # => 1
+  is_proper_superset([1,2], [1,2,3]);   # => 0
+  is_proper_superset([1,2,3], [1,2,3]); # => 0
 
 =head1 EXPORT
 
@@ -311,6 +331,67 @@ sub intersection_by(&@) {
 	}
 
 	return values %set;
+}
+
+=head2 is_proper_subset(@)
+
+Given two sets, will return 1 if the first set is a proper subset of the second, otherwise the return will be 0.
+
+=cut
+
+sub is_proper_subset(@) {
+	my ($set1, $set2) = @_;
+	my $spaceship = _spaceship_set($set1, $set2);
+	return $spaceship == -1 ? 1 : 0;
+}
+
+=head2 is_proper_superset(@)
+
+Given two sets, will return 1 if the first set is a proper superset of the second, otherwise the return will be 0.
+
+=cut
+
+sub is_proper_superset(@) {
+	my ($set1, $set2) = @_;
+	my $spaceship = _spaceship_set($set1, $set2);
+	return $spaceship == 1 ? 1 : 0;
+}
+
+=head2 is_subset(@)
+
+Given two sets, will return 1 if the first set is a subset of the second, otherwise the return will be 0.
+
+=cut
+
+sub is_subset(@){
+	my ($set1, $set2) = @_;
+	my $spaceship = _spaceship_set($set1, $set2);
+  return defined $spaceship && $spaceship <= 0 ? 1 : 0;
+}
+
+=head2 is_superset(@)
+
+Given two sets, will return 1 if the first set is a superset of the second, otherwise the return will be 0.
+
+=cut
+
+sub is_superset(@) {
+	my ($set1, $set2) = @_;
+	my $spaceship = _spaceship_set($set1, $set2);
+	return defined $spaceship && $spaceship >= 0 ? 1 : 0;
+}
+
+# Given two sets will return undef if both sets contain unique values,
+# 1 if the right set only contains unique values,
+# -1 if the left set only contains unique values,
+# or 0 if neither contain unique values.
+sub _spaceship_set(@) {
+	my ($u_a, $u_b) = disjoint(@_);
+	
+	return @$u_a && @$u_b ? undef :
+ 		     @$u_a && ! @$u_b ? 1 :
+				 ! @$u_a && @$u_b ? -1 :
+				 0;
 }
 
 =head2 symmetric_difference(@)

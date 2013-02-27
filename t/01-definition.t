@@ -1,4 +1,4 @@
-use Test::More tests => 74;
+use Test::More tests => 106;
 
 use strict;
 use warnings;
@@ -212,6 +212,51 @@ is_deeply
 	[order_by_id union_by {$_[0]{id}} map {$_} @arr_ids],
 	[map {+{id => $_}} 1 .. 16, 18, 20],
 	'union_by works with internal iterators';
+
+# is_subset
+is is_subset([], []), 1, 'is_subset: the empty set is a subset of itself.';
+is is_subset([], [1,2,3]), 1, 'is_subset: the empty set is a subset of a non-empty set.';
+is is_subset([1,2,3], []), 0, 'is_subset: a non_empty set is not a subset of the empty set.';
+
+is is_subset([1], [1,2,3]), 1, 'is_subset: [1] is a subset of [1,2,3].';
+is is_subset([1,2,3], [1]), 0, 'is_subset: [1,2,3] is not a subset of [1].';
+is is_subset([1,2,3], [1,2,3]), 1, 'is_subset: [1,2,3] is a subset of itself.';
+
+is is_subset(['b'], [qw(a b c)]), 1, 'is_subset: [b] is a subset of [a, b, c].';
+
+is is_subset([1, 2], [3, 4]), 0, 'is_subset: two sets with no intersection are not subsets';
+is is_subset([3, 4], [1, 2]), 0, 'is_subset: two sets with no intersection are not subsets backwards either';
+is is_subset([1, 4], [1, 2]), 0, 'is_subset: two sets with some elements in common but unique elements in each set are not subsets';
+is is_subset([1, 2], [1, 4]), 0, 'is_subset: two sets with some elements in common but unique elements in each set are not subsets backwards either';
+
+# is_proper_subset
+is is_proper_subset([], []), 0, 'is_proper_subset: the empty set is not a subset of itself';
+is is_proper_subset([1,2,3], [1,2,3]), 0, 'is_proper_subset: [1,2,3] is not a subset of itself.';
+is is_proper_subset([1], [1,2,3]), 1, 'is_proper_subset: [1] is a subset of [1,2,3].';
+is is_proper_subset([1,2,3], [1]), 0, 'is_proper_subset: [1,2,3] is not a subset of [1].';
+is is_proper_subset([1,2,3], [1,2,3]), 0, 'is_proper_subset: [1,2,3] is not a subset of itself.';
+
+is is_proper_subset(['b'], [qw(a b c)]), 1, 'is_proper_subset: [b] is a subset of [a, b, c].';
+
+is is_proper_subset([1, 2], [3, 4]), 0, 'is_proper_subset: two sets with no intersection are not subsets';
+is is_proper_subset([3, 4], [1, 2]), 0, 'is_proper_subset: two sets with no intersection are not subsets backwards either';
+is is_proper_subset([1, 4], [1, 2]), 0, 'is_proper_subset: two sets with some elements in common but unique elements in each set are not subsets';
+is is_proper_subset([1, 2], [1, 4]), 0, 'is_proper_subset: two sets with some elements in common but unique elements in each set are not subsets backwards either';
+
+# is_superset
+is is_superset([], []), 1, 'is_superset: the empty set is a supserset of itself.';
+is is_superset([1,2,3], []), 1, 'is_superset: the empty set is a superset of a non-empty set.';
+is is_superset([], [1,2,3]), 0, 'is_superset: a non_empty set is not a superset of the empty set.';
+is is_superset([1,2,3,4], [1,2]), 1, 'is_superset: [1,2,3,4] is a superset of [1,2].';
+is is_superset([qw(a b c d)], [qw(b d)]), 1, 'is_superset: [a b c d] is a superset of [b d].';
+
+# is_proper_superset
+is is_proper_superset([], []), 0, 'is_superset: the empty set is a supserset of itself.';
+is is_proper_superset([1,2,3], [1,2,3]), 0, 'is_superset: the empty set is a supserset of itself.';
+is is_proper_superset([1,2,3], []), 1, 'is_superset: the empty set is a superset of a non-empty set.';
+is is_proper_superset([], [1,2,3]), 0, 'is_superset: a non_empty set is not a superset of the empty set.';
+is is_proper_superset([1,2,3,4], [1,2]), 1, 'is_superset: [1,2,3,4] is a superset of [1,2].';
+is is_proper_superset([qw(a b c d)], [qw(b d)]), 1, 'is_superset: [a b c d] is a superset of [b d].';
 
 #Data Functions
 
