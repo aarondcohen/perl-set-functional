@@ -1,4 +1,5 @@
 .git/
 ignore.txt
+Makefile$
 MANIFEST.bak
 MANIFEST.SKIP
