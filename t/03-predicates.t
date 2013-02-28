@@ -1,7 +1,9 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
-use Test::More tests => 32; #106;
+use Test::More tests => 106;
 use Set::Functional qw{:all};
 
 sub choice { $_[0] }
@@ -18,19 +20,19 @@ my @test_conditions = (
 );
 
 my @tests = (
-#	['is_disjoint',        \&is_disjoint,        qw{0 0 0 0 0 0 0 1}],
-#	['is_equal',           \&is_equal,           qw{1 0 0 0 0 1 0 0}],
+	['is_disjoint',        \&is_disjoint,        qw{1 1 1 0 0 0 0 1}],
+	['is_equal',           \&is_equal,           qw{1 0 0 0 0 1 0 0}],
 	['is_proper_subset',   \&is_proper_subset,   qw{0 1 0 0 1 0 0 0}],
 	['is_proper_superset', \&is_proper_superset, qw{0 0 1 1 0 0 0 0}],
 	['is_subset',          \&is_subset,          qw{1 1 0 0 1 1 0 0}],
 	['is_superset',        \&is_superset,        qw{1 0 1 1 0 1 0 0}],
 
-#	['is_disjoint_by',        sub { &is_disjoint_by(\&choice, @_) },        qw{0 0 0 0 0 0 0 1}],
-#	['is_equal_by',           sub { &is_equal_by(\&choice, @_) },           qw{1 0 0 0 0 1 0 0}],
-#	['is_proper_subset_by',   sub { &is_proper_subset_by(\&choice, @_) },   qw{0 1 0 0 1 0 0 0}],
-#	['is_proper_superset_by', sub { &is_proper_superset_by(\&choice, @_) }, qw{0 0 1 1 0 0 0 0}],
-#	['is_subset_by',          sub { &is_subset_by(\&choice, @_) },          qw{1 1 0 0 1 1 0 0}],
-#	['is_superset_by',        sub { &is_superset_by(\&choice, @_) },        qw{1 0 1 1 0 1 0 0}],
+	['is_disjoint_by',        sub { &is_disjoint_by(\&choice, @_) },        qw{1 1 1 0 0 0 0 1}],
+	['is_equal_by',           sub { &is_equal_by(\&choice, @_) },           qw{1 0 0 0 0 1 0 0}],
+	['is_proper_subset_by',   sub { &is_proper_subset_by(\&choice, @_) },   qw{0 1 0 0 1 0 0 0}],
+	['is_proper_superset_by', sub { &is_proper_superset_by(\&choice, @_) }, qw{0 0 1 1 0 0 0 0}],
+	['is_subset_by',          sub { &is_subset_by(\&choice, @_) },          qw{1 1 0 0 1 1 0 0}],
+	['is_superset_by',        sub { &is_superset_by(\&choice, @_) },        qw{1 0 1 1 0 1 0 0}],
 );
 
 for (@tests) {
@@ -48,14 +50,14 @@ for (@tests) {
 	}
 }
 
-#ok ! is_disjoint([], [], []), 'is_disjoint is false when all sets are the empty set';
-#ok ! is_disjoint([1 .. 5], [6 .. 10], []), 'is_disjoint is false when at least one set is the empty set';
-#ok ! is_disjoint([1 .. 5], [6 .. 10], [8 .. 12]), 'is_disjoint is false when any 2 sets overlap';
-#ok ! is_disjoint([1, 2], [2, 3], [1, 3]), 'is_disjoint is false when every set overlaps';
-#ok is_disjoint([1 .. 5], [6 .. 10], [11 .. 15]), 'is_disjoint is true when no sets overlap';
-#
-#ok ! is_disjoint_by(\&choice, [], [], []), 'is_disjoint_by is false when all sets are the empty set';
-#ok ! is_disjoint_by(\&choice, [1 .. 5], [6 .. 10], []), 'is_disjoint_by is false when at least one set is the empty set';
-#ok ! is_disjoint_by(\&choice, [1 .. 5], [6 .. 10], [8 .. 12]), 'is_disjoint_by is false when any 2 sets overlap';
-#ok ! is_disjoint_by(\&choice, [1, 2], [2, 3], [1, 3]), 'is_disjoint_by is false when every set overlaps';
-#ok is_disjoint_by(\&choice, [1 .. 5], [6 .. 10], [11 .. 15]), 'is_disjoint_by is true when no sets overlap';
+ok is_pairwise_disjoint([], [], []), 'is_pairwise_disjoint is true when all sets are the empty set';
+ok is_pairwise_disjoint([1 .. 5], [6 .. 10], []), 'is_pairwise_disjoint is true when the only overlap is the empty set';
+ok ! is_pairwise_disjoint([1 .. 5], [6 .. 10], [8 .. 12]), 'is_pairwise_disjoint is false when any 2 sets overlap';
+ok ! is_pairwise_disjoint([1, 2], [2, 3], [1, 3]), 'is_pairwise_disjoint is false when every set overlaps';
+ok is_pairwise_disjoint([1 .. 5], [6 .. 10], [11 .. 15]), 'is_pairwise_disjoint is true when no sets overlap';
+
+ok is_pairwise_disjoint_by(\&choice, [], [], []), 'is_pairwise_disjoint_by is true when all sets are the empty set';
+ok is_pairwise_disjoint_by(\&choice, [1 .. 5], [6 .. 10], []), 'is_pairwise_disjoint_by is true when the only overlap is the empty set';
+ok ! is_pairwise_disjoint_by(\&choice, [1 .. 5], [6 .. 10], [8 .. 12]), 'is_pairwise_disjoint_by is false when any 2 sets overlap';
+ok ! is_pairwise_disjoint_by(\&choice, [1, 2], [2, 3], [1, 3]), 'is_pairwise_disjoint_by is false when every set overlaps';
+ok is_pairwise_disjoint_by(\&choice, [1 .. 5], [6 .. 10], [11 .. 15]), 'is_pairwise_disjoint_by is true when no sets overlap';

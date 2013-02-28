@@ -15,7 +15,7 @@ sub get_rand{ $arr[ int(@arr * rand) ] }
 
 sub is_equal_via_disjoint($$) {
 	my ($left, $right) = &disjoint(@_);
-	return ! @$left && ! @$right;
+	return ! (@$left || @$right);
 }
 sub is_equal_via_intersection($$) {
 	my @set = &intersection(@_);

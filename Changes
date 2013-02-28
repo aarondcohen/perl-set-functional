@@ -2,4 +2,7 @@ Revision history for Set-Functional
 
 0.01    Date/time
         First version, released on an unsuspecting world.
-
+1.0     2013-02-28/12:00:00
+        - added predicates
+        - added benchmark scripts
+        - partitioned tests for easier maintenance

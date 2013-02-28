@@ -10,11 +10,11 @@ Set::Functional - set operations for functional programming
 
 =head1 VERSION
 
-Version 0.01
+Version 1.0
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '1.0';
 
 our @EXPORT_OK  = qw{
 	setify setify_by
@@ -23,12 +23,18 @@ our @EXPORT_OK  = qw{
 	disjoint disjoint_by
 	distinct distinct_by
 	intersection intersection_by
-	is_proper_subset is_proper_superset
-	is_subset is_superset
 	symmetric_difference symmetric_difference_by
 	union union_by
+	is_disjoint is_disjoint_by
+	is_equal is_equal_by
+	is_equivalent is_equivalent_by
+	is_pairwise_disjoint is_pairwise_disjoint_by
+	is_proper_subset is_proper_subset_by
+	is_proper_superset is_proper_superset_by
+	is_subset is_subset_by
+	is_superset is_superset_by
 };
-our %EXPORT_TAGS = (all => [@EXPORT_OK]);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 =head1 SYNOPSIS
 
@@ -51,10 +57,11 @@ Example usage:
 
 	use Set::Functional ':all';
 
-  # Set manipulation
+	# Set Creation
 	my @deduped_numbers = setify(1 .. 10, 2 .. 11);
 	my @deduped_objects_by_name = setify_by { $_->{name} } ({name => 'fred'}, {name => 'bob'}, {name => 'fred'});
 
+	# Set Operation
 	my @all_permutations = cartesian \@arr1, \@arr2, \@arr3, \@arr4;
 
 	my @only_arr1_elements = difference \@arr1, \@arr2, \@arr3, \@arr4;
@@ -75,29 +82,31 @@ Example usage:
 	my @all_elements = union \@arr1, \@arr2, \@arr3, \@arr4;
 	my @all_elements_by_name = union_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-  # Predicates
-	is_subset([1], [1,2,3]);     # => 1
-	is_subset([1,2,3], [1]);     # => 0
-	is_subset([1,2,3], [1,2,3]); # => 1
+	# Set Predicates
+	my $is_all_of_arr1_distinct_from_arr2 = is_disjoint \@arr1, \@arr2;
+	my $is_all_of_arr1_distinct_from_arr2_by_name = is_disjoint_by { $_->{name} } \@arr1, \@arr2;
 
-  is_proper_subset([1,2,3], [1,2,3]); # => 0
-  is_proper_subset([1,2,3], [1,2]);   # => 0
-  is_proper_subset([1,2], [1,2,3]);   # => 1
+	my $is_arr1_the_same_as_arr2 = is_equal \@arr1, \@arr2;
+	my $is_arr1_the_same_as_arr2_by_name = is_equal_by { $_->{name} } \@arr1, \@arr2;
 
-  is_superset([1,2,3], [1,2]);   # => 1
-  is_superset([1,2], [1,2,3]);   # => 0
-  is_superset([1,2,3], [1,2,3]); # => 1
+	my $are_all_sets_mutually_unique = is_pairwise_disjoint \@arr1, \@arr2, \@arr3, \@arr4;
+	my $are_all_sets_mutually_unique_by_name = is_pairwise_disjoint_by { $_->{name} } \@arr1, \@arr2, \@arr3, \@arr4;
 
-  is_proper_superset([1,2,3], [1,2]);   # => 1
-  is_proper_superset([1,2], [1,2,3]);   # => 0
-  is_proper_superset([1,2,3], [1,2,3]); # => 0
+	my $is_all_of_arr1_in_arr2_but_not_the_same_as_arr2 = is_proper_subset \@arr1, \@arr2;
+	my $is_all_of_arr1_in_arr2_but_not_the_same_as_arr2_by_name = is_proper_subset_by { $_->{name} } \@arr1, \@arr2;
 
-=head1 EXPORT
+	my $is_all_of_arr1_in_arr2 = is_subset \@arr1, \@arr2;
+	my $is_all_of_arr1_in_arr2_by_name = is_subset_by { $_->{name} } \@arr1, \@arr2;
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+	my $is_all_of_arr2_in_arr1_but_not_the_same_as_arr1 = is_proper_superset \@arr1, \@arr2;
+	my $is_all_of_arr2_in_arr1_but_not_the_same_as_arr1_by_name = is_proper_superset_by { $_->{name} } \@arr1, \@arr2;
 
-=head1 SUBROUTINES
+	my $is_all_of_arr2_in_arr1 = is_superset \@arr1, \@arr2;
+	my $is_all_of_arr2_in_arr1_by_name = is_superset_by { $_->{name} } \@arr1, \@arr2;
+
+=head1 CONSTRUCTORS
+
+=cut
 
 =head2 setify(@)
 
@@ -131,6 +140,10 @@ sub setify_by(&@){
 
 	return values %set;
 }
+
+=head1 OPERATORS
+
+=cut
 
 =head2 cartesian(@)
 
@@ -299,7 +312,7 @@ sub intersection(@) {
 	for (@_) {
 		my @int = grep { exists $set{$_} } @$_;
 		return unless @int;
-		undef %set;
+		%set = ();
 		undef @set{@int};
 	}
 
@@ -326,72 +339,11 @@ sub intersection_by(&@) {
 	for (@_) {
 		my @int = grep { exists $set{$func->($_)} } @$_;
 		return unless @int;
-		undef %set;
+		%set = ();
 		@set{ map { $func->($_) } @int } = @int;
 	}
 
 	return values %set;
-}
-
-=head2 is_proper_subset(@)
-
-Given two sets, will return 1 if the first set is a proper subset of the second, otherwise the return will be 0.
-
-=cut
-
-sub is_proper_subset(@) {
-	my ($set1, $set2) = @_;
-	my $spaceship = _spaceship_set($set1, $set2);
-	return $spaceship == -1 ? 1 : 0;
-}
-
-=head2 is_proper_superset(@)
-
-Given two sets, will return 1 if the first set is a proper superset of the second, otherwise the return will be 0.
-
-=cut
-
-sub is_proper_superset(@) {
-	my ($set1, $set2) = @_;
-	my $spaceship = _spaceship_set($set1, $set2);
-	return $spaceship == 1 ? 1 : 0;
-}
-
-=head2 is_subset(@)
-
-Given two sets, will return 1 if the first set is a subset of the second, otherwise the return will be 0.
-
-=cut
-
-sub is_subset(@){
-	my ($set1, $set2) = @_;
-	my $spaceship = _spaceship_set($set1, $set2);
-  return defined $spaceship && $spaceship <= 0 ? 1 : 0;
-}
-
-=head2 is_superset(@)
-
-Given two sets, will return 1 if the first set is a superset of the second, otherwise the return will be 0.
-
-=cut
-
-sub is_superset(@) {
-	my ($set1, $set2) = @_;
-	my $spaceship = _spaceship_set($set1, $set2);
-	return defined $spaceship && $spaceship >= 0 ? 1 : 0;
-}
-
-# Given two sets will return undef if both sets contain unique values,
-# 1 if the right set only contains unique values,
-# -1 if the left set only contains unique values,
-# or 0 if neither contain unique values.
-sub _spaceship_set(@) {
-	my ($u_a, $u_b) = disjoint(@_);
-	
-	return @$u_a && @$u_b ? undef :
- 		     @$u_a && ! @$u_b ? 1 :
-				 ! @$u_a && @$u_b ? -1 :
-				 0;
 }
 
 =head2 symmetric_difference(@)
@@ -470,23 +422,224 @@ sub union_by(&@) {
 	return values %set;
 }
 
+=head1 PREDICATES
+
+=cut
+
+=head2 is_disjoint($$)
+
+Given two set references, return true if both sets contain none of the same values.
+
+	is_disjoint [1 .. 5], [6 .. 10] => true
+	is_disjoint [1 .. 6], [4 .. 10] => false
+
+=cut
+
+sub is_disjoint($$) {
+	my @set = &intersection(@_[0,1]);
+	return ! @set;
+}
+
+=head2 is_disjoint_by(&$$)
+
+Given a choice function and two sets references, return true if both sets
+contain none of the same values according to the choice function.
+
+=cut
+
+sub is_disjoint_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return ! @set;
+}
+
+=head2 is_equal($$)
+
+Given two set references, return true if both sets contain all the same values.
+Aliased by is_equivalent.
+
+	is_equal [1 .. 5], [1 .. 5] => true
+	is_equal [1 .. 10], [6 .. 15] => false
+
+=cut
+
+sub is_equal($$) {
+	my @set = &intersection(@_[0,1]);
+	return @set == @{$_[0]} && @set == @{$_[1]};
+}
+*is_equivalent = \&is_equal;
+
+=head2 is_equal_by(&$$)
+
+Given a choice function and two sets references, return true if both sets
+contain all the same values according to the choice function.
+Aliased by is_equivalent_by.
+
+=cut
+
+sub is_equal_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return @set == @{$_[1]} && @set == @{$_[2]};
+}
+*is_equivalent_by = \&is_equal_by;
+
+=head2 is_pairwise_disjoint(@)
+
+Given multiple set references, return true if every set is disjoint from every
+other set.
+
+	is_pairwise_disjoint [1 .. 5], [6 .. 10], [11 .. 15] => true
+	is_pairwise_disjoint [1 .. 5], [6 .. 10], [11 .. 15], [3 .. 8] => false
+
+=cut
+
+sub is_pairwise_disjoint(@) {
+	my @sets = &disjoint(@_);
+	do { return 0 if @{$sets[$_]} != @{$_[$_]} } for 0 .. $#sets;
+	return 1;
+}
+
+=head2 is_pairwise_disjoint_by(&@)
+
+Given a choice function and multiple set references, return true if every set
+is disjoint from every other set according to the choice function.
+
+=cut
+
+sub is_pairwise_disjoint_by(&@) {
+	my @sets = &disjoint_by((shift), @_);
+	do { return 0 if @{$sets[$_]} != @{$_[$_]} } for 0 .. $#sets;
+	return 1;
+}
+
+=head2 is_proper_subset($$)
+
+Given two set references, return true if the first set is fully contained by
+but is not equivalent to the second.
+
+	is_proper_subset [1 .. 5], [1 .. 10] => true
+	is_proper_subset [1 .. 5], [1 .. 5] => false
+
+=cut
+
+sub is_proper_subset($$) {
+	my @set = &intersection(@_[0,1]);
+	return @set == @{$_[0]} && @set != @{$_[1]};
+}
+
+=head2 is_proper_subset_by(&$$)
+
+Given a choice function and two set references, return true if the first set
+is fully contained by but is not equivalent to the second according to the
+choice function.
+
+=cut
+
+sub is_proper_subset_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return @set == @{$_[1]} && @set != @{$_[2]};
+}
+
+=head2 is_proper_superset($$)
+
+Given two set references, return true if the first set fully contains but is
+not equivalent to the second.
+
+	is_proper_superset [1 .. 10], [1 .. 5] => true
+	is_proper_superset [1 .. 5], [1 .. 5] => false
+
+=cut
+
+sub is_proper_superset($$) {
+	my @set = &intersection(@_[0,1]);
+	return @set != @{$_[0]} && @set == @{$_[1]};
+}
+
+=head2 is_proper_superset_by(&$$)
+
+Given a choice function and two set references, return true if the first set
+fully contains but is not equivalent to the second according to the choice
+function.
+
+=cut
+
+sub is_proper_superset_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return @set != @{$_[1]} && @set == @{$_[2]};
+}
+
+=head2 is_subset($$)
+
+Given two set references, return true if the first set is fully contained by
+the second.
+
+	is_subset [1 .. 5], [1 .. 10] => true
+	is_subset [1 .. 5], [1 .. 5] => true
+	is_subset [1 .. 5], [2 .. 11] => false
+
+=cut
+
+sub is_subset($$) {
+	my @set = &intersection(@_[0,1]);
+	return @set == @{$_[0]};
+}
+
+=head2 is_subset_by(&$$)
+
+Given a choice function and two set references, return true if the first set
+is fully contained by the second according to the choice function.
+
+=cut
+
+sub is_subset_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return @set == @{$_[1]};
+}
+
+=head2 is_superset($$)
+
+Given two set references, return true if the first set fully contains the
+second.
+
+	is_superset [1 .. 10], [1 .. 5] => true
+	is_superset [1 .. 5], [1 .. 5] => true
+	is_subset [1 .. 5], [2 .. 11] => false
+
+=cut
+
+sub is_superset($$) {
+	my @set = &intersection(@_[0,1]);
+	return @set == @{$_[1]};
+}
+
+=head2 is_superset_by(&$$)
+
+Given a choice function and two set references, return true if the first set
+fully contains the second according to the choice function.
+
+=cut
+
+sub is_superset_by(&$$) {
+	my @set = &intersection_by(@_[0,1,2]);
+	return @set == @{$_[2]};
+}
+
 =head1 AUTHOR
 
 Aaron Cohen, C<< <aarondcohen at gmail.com> >>
 
+Special thanks to:
+L<Logan Bell|http://metacpan.org/author/logie>
+L<Thomas Whaples|https://github.com/twhaples>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-set-functional at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Functional>.  I will
+the web interface at L<https://github.com/aarondcohen/Set-Functional/issues>.  I will
 be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 TODO
 
 =over 4
-
-=item * Add benchmarking scripts as mentioned above.
-
-=item * Add validation functions: is_disjoint, is_empty, is_equal, is_null, is_pairwise_disjoint, is_proper_subset, is_proper_superset, is_subset, is_superset
 
 =item * Add SEE ALSO section
 
@@ -502,19 +655,19 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * Official GitHub Repo
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Set-Functional>
+L<https://github.com/aarondcohen/Set-Functional>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * GitHub's Issue Tracker (report bugs here)
 
-L<http://annocpan.org/dist/Set-Functional>
+L<https://github.com/aarondcohen/Set-Functional/issues>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Set-Functional>
 
-=item * Search CPAN
+=item * Official CPAN Page
 
 L<http://search.cpan.org/dist/Set-Functional/>
 
@@ -522,7 +675,7 @@ L<http://search.cpan.org/dist/Set-Functional/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011 Aaron Cohen.
+Copyright 2011-2013 Aaron Cohen.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
