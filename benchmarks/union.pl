@@ -28,6 +28,3 @@ cmpthese(10000, {
 	union_map => sub { union_map(get_next, get_rand, get_rand, get_rand, get_rand) },
 });
 
-
-#cmpthese(10000, {
-#});

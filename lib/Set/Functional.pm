@@ -14,7 +14,7 @@ Version 1.0
 
 =cut
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 our @EXPORT_OK  = qw{
 	setify setify_by
@@ -47,11 +47,11 @@ be found in this package (shortly).
 
 Each function is provided in two forms.  The first form always expects simple
 flat data structures of defined elements.  The second form expects a BLOCK
-to evaluate each member of the list to a defined value to determine how the
-element is a set member.  These can be identified by the suffix "_by".  None
-of these functions check definedness inline so as to eliminate the costly
-O(n) operation.  All functions have been prototyped to give them a native
-Perl-ish look and feel.
+(refered to as a choice function) to evaluate each member of the list to a
+defined value to determine how the element is a set member.  These can be
+identified by the suffix "_by".  None of these functions check definedness
+inline so as to eliminate the costly O(n) operation.  All functions have been
+prototyped to give them a native Perl-ish look and feel.
 
 Example usage:
 

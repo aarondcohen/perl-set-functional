@@ -6,3 +6,6 @@ Revision history for Set-Functional
         - added predicates
         - added benchmark scripts
         - partitioned tests for easier maintenance
+1.01    2013-09-04/1:00:00
+        - fixed metacpan resources
+        - cleaned up documentation

@@ -1,5 +1,10 @@
+.carton/
 .git/
+.rock.yml
+carton.lock
+cpanfile
 ignore.txt
+local/
 Makefile$
 MANIFEST.bak
 MANIFEST.SKIP

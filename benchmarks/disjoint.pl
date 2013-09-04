@@ -65,38 +65,36 @@ cmpthese(10000, {
 	},
 });
 
-=head
-cmpthese(10000, {
-
-	'exists_fn' => sub {
-		my $lhs = get_next();
-
-		my %set;
-		@set{ map { $id->($_) } @$lhs } = @$lhs;
-
-		for (get_rand(), get_rand(), get_rand(), get_rand()) {
-			my @int = grep { exists $set{$id->($_)} } @$_;
-			return unless @int;
-			undef %set;
-			@set{ map { $id->($_) } @int } = @int;
-		}
-		return keys %set;
-	},
-
-	'slice_defined_fn' => sub {
-		my $lhs = get_next();
-
-		my %set;
-		@set{ map { $id->($_) } @$lhs } = @$lhs;
-
-		for (get_rand(), get_rand(), get_rand(), get_rand()) {
-			my @int = grep { defined } @set{ map { $id->($_) } @$_ };
-			return unless @int;
-			undef %set;
-			@set{ map { $id->($_) } @int } = @int;
-		}
-		return keys %set;
-	},
-
-});
-=cut
+#cmpthese(10000, {
+#
+#	'exists_fn' => sub {
+#		my $lhs = get_next();
+#
+#		my %set;
+#		@set{ map { $id->($_) } @$lhs } = @$lhs;
+#
+#		for (get_rand(), get_rand(), get_rand(), get_rand()) {
+#			my @int = grep { exists $set{$id->($_)} } @$_;
+#			return unless @int;
+#			undef %set;
+#			@set{ map { $id->($_) } @int } = @int;
+#		}
+#		return keys %set;
+#	},
+#
+#	'slice_defined_fn' => sub {
+#		my $lhs = get_next();
+#
+#		my %set;
+#		@set{ map { $id->($_) } @$lhs } = @$lhs;
+#
+#		for (get_rand(), get_rand(), get_rand(), get_rand()) {
+#			my @int = grep { defined } @set{ map { $id->($_) } @$_ };
+#			return unless @int;
+#			undef %set;
+#			@set{ map { $id->($_) } @int } = @int;
+#		}
+#		return keys %set;
+#	},
+#
+#});

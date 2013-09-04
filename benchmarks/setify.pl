@@ -16,12 +16,8 @@ cmpthese(10000, {
 	list_uniq   => sub { List::MoreUtils::uniq(@{get_next()}) },
 });
 
-=head
-
-Rate    hash_map   list_uniq    hash_for hash_coerce
-hash_map    1337/s          --        -40%        -53%        -63%
-list_uniq   2242/s         68%          --        -22%        -38%
-hash_for    2857/s        114%         27%          --        -21%
-hash_coerce 3623/s        171%         62%         27%          --
-
-=cut
+#	Rate    hash_map   list_uniq    hash_for hash_coerce
+#	hash_map    1337/s          --        -40%        -53%        -63%
+#	list_uniq   2242/s         68%          --        -22%        -38%
+#	hash_for    2857/s        114%         27%          --        -21%
+#	hash_coerce 3623/s        171%         62%         27%          --

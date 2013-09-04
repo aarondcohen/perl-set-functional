@@ -2,17 +2,12 @@ use Benchmark qw{:all};
 
 my @arr = (1 .. 10004);
 
-=head
-
-perl benchmark-data-empty.pl
-              Rate   hash_undef  array_undef  hash_assign array_assign
-hash_undef   636/s           --         -24%         -28%         -30%
-array_undef  833/s          31%           --          -5%          -8%
-hash_assign  881/s          39%           6%           --          -3%
-array_assign 907/s          43%           9%           3%           --
-
-=cut
-
+#	perl benchmark-data-empty.pl
+#								Rate   hash_undef  array_undef  hash_assign array_assign
+#	hash_undef   636/s           --         -24%         -28%         -30%
+#	array_undef  833/s          31%           --          -5%          -8%
+#	hash_assign  881/s          39%           6%           --          -3%
+#	array_assign 907/s          43%           9%           3%           --
 
 sub array_assign { my @arr = @_; @arr = (); @arr }
 sub array_undef  { my @arr = @_; undef @arr; @arr }
