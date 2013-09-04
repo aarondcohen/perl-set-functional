@@ -16,9 +16,11 @@ WriteMakefile(
 			'Test::More' => 0,
 	},
 	META_MERGE => {
-		homepage => 'http://github.com/aarondcohen/Set-Functional',
-		repository => 'git://github.com/aarondcohen/Set-Functional.git',
-		bugtracker => 'http://github.com/aarondcohen/Set-Functional/issues',
+		resources => {
+			homepage => 'http://github.com/aarondcohen/Set-Functional',
+			repository => 'git://github.com/aarondcohen/Set-Functional.git',
+			bugtracker => 'http://github.com/aarondcohen/Set-Functional/issues',
+		}
 	},
 	dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean               => { FILES => 'Set-Functional-*' },
