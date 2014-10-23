@@ -10,11 +10,11 @@ Set::Functional - set operations for functional programming
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 our @EXPORT_OK  = qw{
 	setify setify_by
@@ -679,7 +679,7 @@ L<http://search.cpan.org/dist/Set-Functional/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2013 Aaron Cohen.
+Copyright 2011-2014 Aaron Cohen.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

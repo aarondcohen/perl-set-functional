@@ -1,5 +1,8 @@
 Revision history for Perl module Set::Functional
 
+1.04    2014-10-23
+    - modifed Changed format
+
 1.03    2014-10-23
     - cartesian now returns no sets if any of the provided sets are empty
 
