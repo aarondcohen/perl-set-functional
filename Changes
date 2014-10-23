@@ -1,16 +1,20 @@
-Revision history for Set-Functional
+Revision history for Perl module Set::Functional
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
-1.0     2013-02-28/12:00:00
-        - added predicates
-        - added benchmark scripts
-        - partitioned tests for easier maintenance
-1.01    2013-09-04/1:00:00
-        - fixed metacpan resources
-        - cleaned up documentation
-1.02    2013-09-04/1:00:00
-        - fixed metacpan resources
-        - cleaned up documentation
-1.03    2014-10-23/15:30:00
-        - cartesian now returns no sets if any of the provided sets are empty
+1.03    2014-10-23
+    - cartesian now returns no sets if any of the provided sets are empty
+
+1.02    2013-09-04
+    - fixed metacpan resources
+    - cleaned up documentation
+
+1.01 2013-09-04
+    - fixed metacpan resources
+    - cleaned up documentation
+
+1.0 2013-02-28
+    - added predicates
+    - added benchmark scripts
+    - partitioned tests for easier maintenance
+
+0.01 2011-09-26
+    - First version, released on an unsuspecting world.
