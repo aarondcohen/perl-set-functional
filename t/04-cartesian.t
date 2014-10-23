@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Set::Functional qw{:all};
 
 #Predeclarations
@@ -19,7 +19,8 @@ my @arr_nums = (\@arr_num1, \@arr_num2, \@arr_num3);
 #Cartesian
 is_deeply [cartesian], [], 'cartesian returns no sets with no sets';
 is_deeply [cartesian \@arr_num1], [map {[$_]} @arr_num1], 'cartesian returns each element as its own set with one set';
-is_deeply [cartesian \@arr_num1, []], [[]], 'cartesian with the empty set returns the empty set';
+is_deeply [cartesian \@arr_num1, []], [], 'cartesian with the empty set returns the empty set';
+is_deeply [cartesian [], \@arr_num1], [], 'cartesian with the empty set is abelian';
 is_deeply
 	[cartesian @arr_nums],
 	get_cartesian_arr_nums,

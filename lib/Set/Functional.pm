@@ -10,11 +10,11 @@ Set::Functional - set operations for functional programming
 
 =head1 VERSION
 
-Version 1.0
+Version 1.03
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 our @EXPORT_OK  = qw{
 	setify setify_by
@@ -148,10 +148,13 @@ sub setify_by(&@){
 =head2 cartesian(@)
 
 Given multiple set references, return multiple sets containing all permutations
-of one element from each set.  If the empty set is provided, the empty set is
-returned.  If no sets are provided then none are returned.
+of one element from each set.  If the empty set is provided, no sets are
+returned since the number of sets generated should be the product of the input
+sets' cardinalities.  If no sets are provided then none are returned.
 
 	cartesian [1 .. 3], [1 .. 2] => [1,1],[1,2],[2,1],[2,2],[3,1],[3,2]
+	cartesin => ()
+	cartesin [1 .. 3], [] => ()
 
 =cut
 
@@ -161,7 +164,7 @@ sub cartesian(@) {
 	my @results;
 	my $repetitions = 1;
 
-	($repetitions *= @$_) || return [] for @_;
+	($repetitions *= @$_) || return for @_;
 	$#results = $repetitions - 1;
 
 	for my $idx (0 .. $#results) {
@@ -630,6 +633,7 @@ Aaron Cohen, C<< <aarondcohen at gmail.com> >>
 Special thanks to:
 L<Logan Bell|http://metacpan.org/author/logie>
 L<Thomas Whaples|https://github.com/twhaples>
+L<Dibin Pookombil|https://github.com/dibinp>
 
 =head1 BUGS
 
