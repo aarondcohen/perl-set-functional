@@ -47,7 +47,7 @@ be found in this package (shortly).
 
 Each function is provided in two forms.  The first form always expects simple
 flat data structures of defined elements.  The second form expects a BLOCK
-(refered to as a choice function) to evaluate each member of the list to a
+(referred to as a choice function) to evaluate each member of the list to a
 defined value to determine how the element is a set member.  These can be
 identified by the suffix "_by".  None of these functions check definedness
 inline so as to eliminate the costly O(n) operation.  All functions have been
