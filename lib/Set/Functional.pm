@@ -153,8 +153,8 @@ returned since the number of sets generated should be the product of the input
 sets' cardinalities.  If no sets are provided then none are returned.
 
 	cartesian [1 .. 3], [1 .. 2] => [1,1],[1,2],[2,1],[2,2],[3,1],[3,2]
-	cartesin => ()
-	cartesin [1 .. 3], [] => ()
+	cartesian => ()
+	cartesian [1 .. 3], [] => ()
 
 =cut
 
